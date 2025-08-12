@@ -1,82 +1,74 @@
-# Lightweight React Template for KAVIA
+# Notes Frontend (React)
 
-This project provides a minimal React template with a clean, modern UI and minimal dependencies.
+Minimalistic, light-themed notes application with a sidebar, searchable list, and editor.  
+Supports Supabase-backed persistence via environment variables; falls back to localStorage when not configured.
 
 ## Features
 
-- **Lightweight**: No heavy UI frameworks - uses only vanilla CSS and React
-- **Modern UI**: Clean, responsive design with KAVIA brand styling
-- **Fast**: Minimal dependencies for quick loading times
-- **Simple**: Easy to understand and modify
+- Create, edit, delete notes
+- View list of notes with timestamps
+- Search notes (title and content)
+- Light/dark theme toggle
+- Supabase integration via environment variables
 
 ## Getting Started
 
-In the project directory, you can run:
+1. Install dependencies:
+   npm install
 
-### `npm start`
+2. (Optional) Configure Supabase:
+   - Copy .env.example to .env
+   - Set:
+     REACT_APP_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
+     REACT_APP_SUPABASE_KEY=YOUR-ANON-KEY
 
-Runs the app in development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   If the variables are not provided, the app uses localStorage.
 
-### `npm test`
+3. Start the app:
+   npm start
+   Open http://localhost:3000 in your browser.
 
-Launches the test runner in interactive watch mode.
+4. Run tests:
+   npm test
 
-### `npm run build`
+5. Build:
+   npm run build
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Supabase Schema
 
-## Customization
+Create a notes table:
 
-### Colors
+create table if not exists public.notes (
+  id uuid primary key default gen_random_uuid(),
+  title text not null default 'Untitled',
+  content text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 
-The main brand colors are defined as CSS variables in `src/App.css`:
+For more details and optional triggers/policies, see ../../assets/supabase.md.
 
-```css
-:root {
-  --kavia-orange: #E87A41;
-  --kavia-dark: #1A1A1A;
-  --text-color: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
-  --border-color: rgba(255, 255, 255, 0.1);
-}
-```
+## Code Structure
 
-### Components
+- src/components
+  - Header.js — App header with theme toggle
+  - Sidebar.js — New note button and search field
+  - NoteList.js — List of notes with selection and delete
+  - NoteEditor.js — Editor (title and content) with Save
+- src/services
+  - supabaseClient.js — Initializes Supabase client from env vars
+  - notesService.js — CRUD abstraction (Supabase or localStorage fallback)
+- src/App.js — Main layout and state wiring
+- src/App.css — Styles and layout
 
-This template uses pure HTML/CSS components instead of a UI framework. You can find component styles in `src/App.css`. 
+## Environment Variables
 
-Common components include:
-- Buttons (`.btn`, `.btn-large`)
-- Container (`.container`)
-- Navigation (`.navbar`)
-- Typography (`.title`, `.subtitle`, `.description`)
+- REACT_APP_SUPABASE_URL
+- REACT_APP_SUPABASE_KEY
 
-## Learn More
+These must be set at build time for Create React App to expose them to the frontend.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Notes
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- With Supabase configured, data is stored in your project database.
+- Without it, data is stored in localStorage under key kavia_notes_fallback_v1.
